@@ -1,38 +1,60 @@
 (function ($) {
     'use strict';
 
-    function coroutine(fn) {
-        var tick,
-            it;
+    var exceptionHandler,
+        coroutine;
 
-        tick = function (prev) {
-            var cur = it.next(prev);
+    coroutine = function (fn) {
+        function run(err, it) {
+            var tick;
 
-            if (cur.done) {
-                return;
-            }
+            tick = function (prev) {
+                var cur;
 
-            cur.value.then(
-                function () {
-                    tick({
-                        success: true,
-                        args: arguments
-                    });
-                },
-                function () {
-                    tick({
-                        success: false,
-                        args: arguments
-                    })
+                try {
+                    cur = it.next(prev);
+
+                    if (cur.done) {
+                        return;
+                    }
+
+                    cur.value.then(
+                        function () {
+                            tick({
+                                success: true,
+                                args: arguments
+                            });
+                        },
+                        function () {
+                            tick({
+                                success: false,
+                                args: arguments
+                            })
+                        }
+                    );
+                } catch (e) {
+                    if (e.stack && err.stack) {
+                        e.stack += '\n\nCoroutine call stack trace:\n'
+                            + err.stack;
+                    }
+
+                    if (exceptionHandler) {
+                        exceptionHandler(e);
+                    } else {
+                        throw e;
+                    }
                 }
-            );
-        };
+            };
+
+            (function () {
+                tick();
+            }());
+        }
 
         return function () {
-            it = fn();
-            tick();
+            return run(new Error, fn());
         }
-    }
+    };
 
     function test() {
         var doShit = coroutine(function* doShit() {
@@ -56,7 +78,12 @@
         });
 
         doShit();
+        doShit();
     }
 
     test();
+
+    exceptionHandler = function (x) {
+        console.log(x.stack);
+    }
 }(jQuery));
