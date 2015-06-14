@@ -1,22 +1,37 @@
 (function (exports) {
     'use strict';
 
-    var exceptionHandler,
+    var FailValue,
+        exceptionHandler,
+        fail,
         coroutine,
         sleep;
+
+    FailValue = function (value) {
+        this.value = value;
+    };
+
+    fail = function (value) {
+        return new FailValue(value);
+    };
 
     coroutine = function (fn) {
         function run(err, it) {
             var tick;
 
-            tick = function (prev, resolve) {
+            tick = function (prev, resolve, reject) {
                 var cur;
 
                 try {
                     cur = it.next(prev);
 
                     if (cur.done) {
-                        resolve(cur.value);
+                        if (cur.value instanceof FailValue) {
+                            reject(cur.value.value);
+                        } else {
+                            resolve(cur.value);
+                        }
+
                         return;
                     }
 
@@ -25,13 +40,13 @@
                             tick({
                                 success: true,
                                 args: arguments
-                            }, resolve);
+                            }, resolve, reject);
                         },
                         function () {
                             tick({
                                 success: false,
                                 args: arguments
-                            }, resolve);
+                            }, resolve, reject);
                         }
                     );
                 } catch (e) {
@@ -48,8 +63,8 @@
                 }
             };
 
-            return new Promise(function (resolve) {
-                tick(undefined, resolve);
+            return new Promise(function (resolve, reject) {
+                tick(undefined, resolve, reject);
             });
         }
 
@@ -66,14 +81,17 @@
 
     exports.coroutine = coroutine;
     exports.sleep = sleep;
+    exports.fail = fail;
 
     function test() {
         var doShit = coroutine(function* doShit() {
-                var result = yield $.get('data.json');
+                //var result = yield $.get('data.json');
 
-                if (result.success) {
-                    return result.args[0];
-                }
+                return fail('fail!');
+
+                //if (result.success) {
+                //    return result.args[0];
+                //}
             }),
             doMoreShit = coroutine(function* doMoreShit(extra) {
                 var result = yield doShit(),
@@ -83,6 +101,8 @@
                     data = result.args[0];
                     data.extra = extra;
                     console.log('done shit', data);
+                } else {
+                    console.log('shit not done', result.args);
                 }
             });
 
