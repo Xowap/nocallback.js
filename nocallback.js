@@ -54,7 +54,7 @@
         }
 
         return function () {
-            return run(new Error, fn());
+            return run(new Error, fn.apply(null, arguments));
         }
     };
 
@@ -75,15 +75,18 @@
                     return result.args[0];
                 }
             }),
-            doMoreShit = coroutine(function* doMoreShit() {
-                var result = yield doShit();
+            doMoreShit = coroutine(function* doMoreShit(extra) {
+                var result = yield doShit(),
+                    data;
 
                 if (result.success) {
-                    console.log('done shit', result.args[0]);
+                    data = result.args[0];
+                    data.extra = extra;
+                    console.log('done shit', data);
                 }
             });
 
-        doMoreShit();
+        doMoreShit('bonjour');
     }
 
     test();
