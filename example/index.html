@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>This is a test</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.4/journal/bootstrap.min.css"/>
+</head>
+<body>
+    <div class="container">
+        <h1>Fake Subscription</h1>
+
+        <form novalidate action="" class="form-horizontal" id="form">
+            <fieldset>
+                <legend>Please Enter Info</legend>
+
+                <ul class="form-group" style="display: none;" id="errors">
+                </ul>
+
+                <div class="form-group">
+                    <label for="email" class="col-sm-2">Email</label>
+                    <div class="col-sm-10">
+                        <input type="email" required class="form-control" id="email" placeholder="toto@toto.com"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-10 col-sm-offset-2">
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+        <div class="well" style="display: none;" id="success">
+            <p>You have been fake subscribed!</p>
+        </div>
+    </div>
+
+    <script src="../src/nocallback.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
