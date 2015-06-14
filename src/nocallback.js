@@ -1,11 +1,20 @@
+var exports = {};
+
+if (window) {
+    window.nocallback = exports;
+}
+
 (function (exports) {
     'use strict';
 
     var FailValue,
-        exceptionHandler,
         fail,
+        exceptionHandler,
         coroutine,
-        sleep;
+        sleep,
+        waitDocumentReady,
+        waitEvent,
+        setExceptionHandler;
 
     FailValue = function (value) {
         this.value = value;
@@ -13,6 +22,10 @@
 
     fail = function (value) {
         return new FailValue(value);
+    };
+
+    exceptionHandler = function (x) {
+        console.error(x.stack);
     };
 
     coroutine = function (fn) {
@@ -79,39 +92,37 @@
         });
     };
 
+    waitDocumentReady = function () {
+        return new Promise(function (resolve) {
+            if (document.readyState != 'loading') {
+                resolve();
+            } else {
+                document.addEventListener('DOMContentLoaded', resolve);
+            }
+        });
+    };
+
+    waitEvent = function (element, eventName) {
+        return new Promise(function (resolve) {
+            var handler;
+
+            handler = function (event) {
+                element.removeEventListener(eventName, handler);
+                resolve(event);
+            };
+
+            element.addEventListener(eventName, handler);
+        });
+    };
+
+    setExceptionHandler = function (fn) {
+        exceptionHandler = fn;
+    };
+
     exports.coroutine = coroutine;
     exports.sleep = sleep;
     exports.fail = fail;
-
-    function test() {
-        var doShit = coroutine(function* doShit() {
-                //var result = yield $.get('data.json');
-
-                return fail('fail!');
-
-                //if (result.success) {
-                //    return result.args[0];
-                //}
-            }),
-            doMoreShit = coroutine(function* doMoreShit(extra) {
-                var result = yield doShit(),
-                    data;
-
-                if (result.success) {
-                    data = result.args[0];
-                    data.extra = extra;
-                    console.log('done shit', data);
-                } else {
-                    console.log('shit not done', result.args);
-                }
-            });
-
-        doMoreShit('bonjour');
-    }
-
-    test();
-
-    exceptionHandler = function (x) {
-        console.log(x.stack);
-    }
-}({}));
+    exports.waitDocumentReady = waitDocumentReady;
+    exports.waitEvent = waitEvent;
+    exports.setExceptionHandler = setExceptionHandler;
+}(exports));
