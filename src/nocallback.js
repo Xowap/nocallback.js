@@ -1,3 +1,10 @@
+/*!
+ * nocallback.js
+ *
+ * Copyright Rémy Sanchez <remy.sanchez@hyperthese.net>
+ * Licenced under the terms of the WTFPL
+ */
+
 var exports = {};
 
 if (window) {
