@@ -1,0 +1,22 @@
+{
+  "name": "nocallback",
+  "version": "0.2.0",
+  "description": "Async JS without callbacks. Get things simple again.",
+  "main": "src/nocallback.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xowap/nocallback.js.git"
+  },
+  "author": "Rémy Sanchez <remy.sanchez@hyperthese.net>",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/Xowap/nocallback.js/issues"
+  },
+  "homepage": "https://github.com/Xowap/nocallback.js#readme"
+}
